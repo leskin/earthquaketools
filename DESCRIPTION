@@ -6,7 +6,7 @@ Author: Leo Eskin
 Maintainer: Leo Eskin <yourself@somewhere.net>
 Description: This is an Earthquake Visualization Tools Package for the NOAA Significant Earthquake Database.  The package includes tools to map the earthquakes along a timeline and to display the earthquakes geographically on a map.
    The earthquaketools package was written for the Mastering Software Development in R Capstone Class in June 2018.
-License: CCO
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1

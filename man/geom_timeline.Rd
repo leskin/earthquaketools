@@ -2,29 +2,31 @@
 % Please edit documentation in R/earthquake_functions.R
 \name{geom_timeline}
 \alias{geom_timeline}
-\title{Create a new geom (geom_hurricane) for ggplot2}
+\title{Geom for creating a timeline from earthquake data}
 \usage{
 geom_timeline(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, ...)
+  inherit.aes = TRUE, x = NULL, y = NULL, xmindate = NULL,
+  xmaxdate = NULL, ...)
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappins created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
 it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.}
 
-\item{data}{The datat to be displayed in this layer.  There are three options:
+\item{data}{The data to be displayed in this layer.  There are three options:
 
 If NULL, the default, the data is inherited from the plot data as specified in the call to ggplot.
 
-A data.frame, or other object, will override the plot data.  All objects will be fortified to produce a data frame.  See fortify for which variables will be created.
+A data.frame, or other object, will override the plot data.  All objects will be fortified to produce a data frame.
+See fortify for which variables will be created.
 
-A function will be called wiht a single argument, the plot data. The return value must be a data.frame, and will be used as the layer data.}
+A function will be called with a single argument, the plot data. The return value must be a data.frame, and will be used as the layer data.}
 
 \item{stat}{The statistical transformation to use on the data for this layer, as a string.}
 
 \item{position}{Position adjustment, either as a string, or the result of a call to a position adjustment function.}
 
-\item{na.rm}{If FALSE, the default, missing values are mremoved wiht a warning.  If TRUE, missing values are silently removed.}
+\item{na.rm}{If FALSE, the default, missing values are mremoved with a warning.  If TRUE, missing values are silently removed.}
 
 \item{show.legend}{logical.  Should this layer be included in the legends?  NA, the default, incldes if any aesthetics are mapped.  False never includes,
 and TRUE always includes.}
@@ -32,33 +34,47 @@ and TRUE always includes.}
 \item{inherit.aes}{If FALSE, overrides the default aesthetics, rather than combining with them.  This is most usefule for helper functions that
 define both data and aesthetics and shouldn't inherit behavior from the default plot specification, e.t. borders.}
 
+\item{x}{Date of the earthquake (required)}
+
+\item{y}{Factor indicating some striatification in which case multiple time lines will be ploted for each level of the factor (e.g. country).}
+
+\item{xmindate}{Minimum year to display on the timeline}
+
+\item{xmaxdate}{Maximum year to display on the timeline}
+
 \item{...}{Other arguments passed on layer.  Thes are often aesthetics, used to set an aesthetic to a fixed value, like color = "red" or size = 3.
 They may also be parameters to the paired geom/stat.}
-
-\item{scale_radii}{This is a scale factor which is multiplied by the actual wind radius for each wind speed to shrink or enlarge
-the wind radii chart as desired.}
 }
 \value{
 This function has no return value
 }
 \description{
-This function creates a new geom which will add a hurricane wind radii chart
-to a base map.  The user must supply the desired longitude and latitude for the
-wind radii chart as well as wind radius information for three wind speeds
-(34 knots, 50 knots and 64 knots) each of the four compampass
-quadrants (ne, nw, se, sw)
+This function creates a new geom which will create a linear timeline for a
+specified time range, and will display each earthquake as a point on the timeline.
 }
 \details{
-This geom makes use of the GeomHurricane ggproto object, inherits from the basic Geom.
-The GeomHurricane object defines default values for the
-aesthetics size, linetype and alpha.  A null ggproto opject is created if there are not
-three or more points in the polygon.
+This geom makes use of the GeomEarthquake ggproto object, inherits from the basic Geom.
+The GeomEarthquake object defines default values for the optional
+aesthetics color, size, and alpha.  A null ggproto opject is created if there are no
+earthquakes in the desired time range.
 
-This geom is based on (but does not inherit from) the polygon geom (geom_polygon).  Many of the input
-parameters are the same as for the geom_polygon.  Parameter descriptions for identical parameters
-are taken from the geom_polygon help file to minimize confusion.
+This geom is based on (but does not inherit from) the point geom (geom_point).  Many of the input
+parameters are the same as for the geom_point.  Parameter descriptions for identical parameters
+are taken from the geom_point help file to minimize confusion.
+
+
+
+A new ggproto object (GeomEarthquake) is created for this geom.  The ggproto object inherits from the basic Geom.
+Default values are provided for the aesthetics size, linetype and alpha.  A null ggproto opject is created if there are no
+earthquakes in the desired time range.
+
+This code is based on input from the Extending ggplot2 vignette:
+https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
 }
 \examples{
-\dontrun{geom_hurricane(data = storm_observation,aes(x = longitude, y = latitude,fill = wind_speed, color = wind_speed), scale_radii = 0.5)}
+\dontrun{geom_timeline(data = earthquakes_clean,
+                       aes(x = DATE, y = COUNTRY,
+                       colour = TOTAL_DEATHS, size = EQ_PRIMARY), alpha = 0.6,
+                       xmindate = 2000, xmaxdate = 2017)}
 
 }
