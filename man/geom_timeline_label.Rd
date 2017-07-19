@@ -6,7 +6,7 @@
 \usage{
 geom_timeline_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 20,
+  inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 0.5,
   check_overlap = FALSE, x = NULL, label = NULL, n_max = NA,
   xmindate = NA, xmaxdate = NA, ...)
 }
