@@ -301,7 +301,7 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
                                 inherit.aes = TRUE,
                                 parse = FALSE,
                                 nudge_x = 0,
-                                nudge_y = 20,
+                                nudge_y = 0.5,
                                 check_overlap = FALSE,
                                 x = NULL, label = NULL,
                                 n_max = NA,
@@ -309,7 +309,7 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
                                 #df = (.),
                                 ...) {
 
-    if (!missing(nudge_x) || !missing(nudge_y)) {
+    if (!missing(nudge_x) || !missing(nudge_y) || nudge_x != 0 || nudge_y != 0) {
       if (!missing(position)) {
         stop("specify either 'position' or 'nudge_x'/'nudge_y'", call. = FALSE)
       }
