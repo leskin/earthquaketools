@@ -34,33 +34,37 @@
 #'
 #' @export
 eq_clean_data <- function(earthquakes_raw) {
+  with(earthquakes_raw, {
+    earthquakes_clean <- earthquakes_raw %>%
 
-  earthquakes_clean <- earthquakes_raw %>%
-    #dplyr::select(YEAR, MONTH, DAY, EQ_PRIMARY, COUNTRY, LOCATION_NAME, LATITUDE, LONGITUDE, TOTAL_DEATHS) %>%  # Select only the needed columns
-    dplyr::filter(.$YEAR >= 0) %>%  # the Date class only pertains positive year values
-    tidyr::replace_na(list(MONTH = 1, DAY = 1)) %>% # replace any NA values with 1 for MONTH and DAY
-    tidyr::unite(datetime, YEAR, MONTH, DAY, remove = FALSE, sep = "-") %>%  # create a datetime character variable for processing
-    dplyr::mutate(DATE = as.POSIXct(datetime, format = "%Y-%m-%d")) %>% # convert datetime to the Date class
-    dplyr::mutate(LONGITUDE = as.double(LONGITUDE), LATITUDE = as.double(LATITUDE)) %>% # convert LATITUDE and LONGITUDE from character to double
-    dplyr::mutate(DAMAGE_MILLIONS_DOLLARS = as.double(DAMAGE_MILLIONS_DOLLARS)) %>% # convert damage to double from character
-    dplyr::mutate(TOTAL_DEATHS = as.integer(TOTAL_DEATHS), TOTAL_MISSING = as.integer(TOTAL_MISSING)) %>% # convert dead and missing from character to integer
-    #dplyr::filter((!is.na(LONGITUDE) && (!is.na(LATITUDE)))) %>% # remove any records without lat and lon data
-    dplyr::mutate(clean_loc = gsub(".*:","", LOCATION_NAME)) %>% # remove the country name(s) from the LOCATION_NAME
-    dplyr::mutate(LOCATION_NAME = lettercase::str_title_case(tolower(clean_loc))) %>% # and convert LOCATION_NAME to title case
-    dplyr::mutate(plot_magnitude = EQ_PRIMARY) %>%
-    dplyr::mutate(EQ_PRIMARY = as.double(EQ_PRIMARY)) %>%
-    dplyr::mutate(EQ_MAG_MW = as.double(EQ_MAG_MW)) %>%
-    dplyr::mutate(EQ_MAG_MS = as.double(EQ_MAG_MS)) %>%
-    dplyr::mutate(EQ_MAG_MB = as.double(EQ_MAG_MB)) %>%
-    dplyr::mutate(EQ_MAG_ML = as.double(EQ_MAG_ML)) %>%
-    dplyr::mutate(EQ_MAG_MFA = as.double(EQ_MAG_MFA)) %>%
-    dplyr::mutate(EQ_MAG_UNK = as.double(EQ_MAG_UNK)) %>%
-    tidyr::replace_na(list(plot_magnitude = 0)) %>%
-    dplyr::mutate(plot_magnitude = as.double(plot_magnitude)) %>%
-    dplyr::select(-clean_loc, -datetime) # remove unneeded intermediate columns from the data.frame
+      #dplyr::select(YEAR, MONTH, DAY, EQ_PRIMARY, COUNTRY, LOCATION_NAME, LATITUDE, LONGITUDE, TOTAL_DEATHS) %>%  # Select only the needed columns
+      dplyr::filter(.$YEAR >= 0) %>%  # the Date class only pertains positive year values
+      tidyr::replace_na(list(MONTH = 1, DAY = 1)) %>% # replace any NA values with 1 for MONTH and DAY
+      tidyr::unite(datetime, YEAR, MONTH, DAY, remove = FALSE, sep = "-") %>%  # create a datetime character variable for processing
+      dplyr::mutate(DATE = as.POSIXct(datetime, format = "%Y-%m-%d")) %>% # convert datetime to the Date class
+      dplyr::mutate(LONGITUDE = as.double(LONGITUDE), LATITUDE = as.double(LATITUDE)) %>% # convert LATITUDE and LONGITUDE from character to double
+      dplyr::mutate(DAMAGE_MILLIONS_DOLLARS = as.double(DAMAGE_MILLIONS_DOLLARS)) %>% # convert damage to double from character
+      dplyr::mutate(TOTAL_DEATHS = as.integer(TOTAL_DEATHS), TOTAL_MISSING = as.integer(TOTAL_MISSING)) %>% # convert dead and missing from character to integer
+      #dplyr::filter((!is.na(LONGITUDE) && (!is.na(LATITUDE)))) %>% # remove any records without lat and lon data
+      dplyr::mutate(clean_loc = gsub(".*:","", LOCATION_NAME)) %>% # remove the country name(s) from the LOCATION_NAME
+      dplyr::mutate(LOCATION_NAME = lettercase::str_title_case(tolower(clean_loc))) %>% # and convert LOCATION_NAME to title case
+      dplyr::mutate(plot_magnitude = EQ_PRIMARY) %>%
+      dplyr::mutate(EQ_PRIMARY = as.double(EQ_PRIMARY)) %>%
+      dplyr::mutate(EQ_MAG_MW = as.double(EQ_MAG_MW)) %>%
+      dplyr::mutate(EQ_MAG_MS = as.double(EQ_MAG_MS)) %>%
+      dplyr::mutate(EQ_MAG_MB = as.double(EQ_MAG_MB)) %>%
+      dplyr::mutate(EQ_MAG_ML = as.double(EQ_MAG_ML)) %>%
+      dplyr::mutate(EQ_MAG_MFA = as.double(EQ_MAG_MFA)) %>%
+      dplyr::mutate(EQ_MAG_UNK = as.double(EQ_MAG_UNK)) %>%
+      tidyr::replace_na(list(plot_magnitude = 0)) %>%
+      dplyr::mutate(plot_magnitude = as.double(plot_magnitude)) %>%
+      dplyr::select(-clean_loc, -datetime) # remove unneeded intermediate columns from the data.frame
 
-  return(earthquakes_clean)
+    return(earthquakes_clean)
+  })
+
 }
+
 
 
 
@@ -88,7 +92,7 @@ eq_clean_data <- function(earthquakes_raw) {
 #' https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
 
 #'
-#' @param mapping A set of aesthetic mappins created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
+#' @param mapping A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
 #' it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.
 #' @param data The data to be displayed in this layer.  There are three options:
 #'
@@ -131,7 +135,7 @@ geom_timeline <- function(mapping = NULL, data = NULL,
                           inherit.aes = TRUE,
                           x = NULL, y = NULL,
                           #size = NULL, alpha = NA, fill = NA,
-                          xmindate = NULL, xmaxdate = NULL,
+                          xmindate = NA, xmaxdate = NA,
                           ...) {
 
   ggplot2::layer(
@@ -158,7 +162,7 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                      fill = NA, alpha = 0.5,
                                      #size = 1.5,
                                      stroke = 0.5, lwd = 1,
-                                     xmindate = NULL, xmaxdate = NULL#,
+                                     xmindate = NA, xmaxdate = NA#,
                                      #linetype = 1
                                    ),
 
@@ -166,28 +170,28 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 
                                    setup_data = function(data, params) {
                                      #browser()
-                                     if (!is.null(params$xmindate) & !is.null(data)) {
+                                     if (!is.na(params$xmindate) & !is.null(data)) {
                                        data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
                                      }
-                                     if (!is.null(params$xmaxdate) & !is.null(data)) {
+                                     if (!is.na(params$xmaxdate) & !is.null(data)) {
                                        data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
                                      }
                                      #browser()
                                      if (!is.numeric(data$size)) {
                                        data <- data %>% dplyr::mutate(size = as.double(size))
                                      }
-                                     if (!is.null(data$y)) {
-                                       data["timeline_yval"] <- data$y / (1 + max(data$y))
-                                     } else {
-                                       data["timeline_yval"] = 0.2
-                                     }
+                                     #if (!is.null(data$y)) {
+                                    #   data["timeline_yval"] <- data$y / (1 + max(data$y))
+                                    # } else {
+                                    #   data["timeline_yval"] = 0.2
+                                    # }
                                      #browser()
                                      data
                                    },
 
                                    draw_panel = function(data, panel_params, coord) {
                                      #browser()
-                                     # return a nullGrob if no point info
+                                     # return a nullGrob for GeomEarthquake if no point info
                                      n <- nrow(data)
                                      if (n < 1) return(grid::nullGrob())
 
@@ -197,8 +201,11 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                        data$timeline_yval <- panel_params$y.major[data$y]
                                      } else {
                                        ## establish a major tick at the y location of the points for this single group of points
-                                       panel_params$y.major[1] <- data$timeline_yval[1]
+                                       ## set the y value for the points on the timeline to match the y axis location of the major tick
+                                       data$timeline_yval <- 0.2
                                        panel_params$y.major_source[1] <- 1
+                                       panel_params$y.major[1] <- data$timeline_yval[1]
+                                       #data$timeline_yval <- data$y / (1 + max(data$y))
                                      }
 
                                      ## Transform the data first
@@ -245,7 +252,7 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 #' This code is based on input from the Extending ggplot2 vignette:
 #' https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
 #'
-#' @param mapping A set of aesthetic mappins created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
+#' @param mapping A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
 #' it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.
 #' @param data The data to be displayed in this layer.  There are three options:
 #'
@@ -274,6 +281,8 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 #' @param parse If TRUE, the labels will be parsed into expressions and displayed
 #'   as described in ?plotmath
 #' @param check_overlap If TRUE, text that overlaps previous text in the same layer will not be plotted
+#' @param xmindate Minimum year to display on the timeline
+#' @param xmaxdate Maximum year to display on the timeline
 #'
 #' @return This function has no return value
 #'
@@ -292,17 +301,19 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
                                 inherit.aes = TRUE,
                                 parse = FALSE,
                                 nudge_x = 0,
-                                nudge_y = 0,
+                                nudge_y = 20,
                                 check_overlap = FALSE,
                                 x = NULL, label = NULL,
                                 n_max = NA,
+                                xmindate = NA, xmaxdate = NA,
+                                #df = (.),
                                 ...) {
 
     if (!missing(nudge_x) || !missing(nudge_y)) {
       if (!missing(position)) {
         stop("specify either 'position' or 'nudge_x'/'nudge_y'", call. = FALSE)
       }
-      position <- position_nudge(nudge_x, nudge_y)
+      position <- ggplot2::position_nudge(nudge_x, nudge_y)
     }
     ggplot2::layer(
       geom = GeomEarthquakeLabel,
@@ -315,6 +326,9 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
       params = list(
         parse = parse,
         check_overlap = check_overlap,
+        xmindate = xmindate,
+        xmaxdate = xmaxdate,
+        #df = df,
         #label = label,
         #n_max = n_max,
         na.rm = na.rm,
@@ -331,25 +345,32 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::GeomText
                                           n_max = NA,
                                           colour = "black", size = 3.88, angle = 45,
                                           hjust = 0.5, vjust = 2, alpha = NA,
-                                          family = "", fontface = 1, lineheight = 1.2
+                                          family = "", fontface = 1, lineheight = 1.2,
+                                          xmindate = NA, xmaxdate = NA
                                           ),
                                    draw_key = ggplot2::draw_key_text,
 
                                    setup_data = function(data, params) {
-                                     ##browser()
-                                     if (!is.null(data$y)) {
-                                       data["timeline_yval"] <- data$y / (1 + max(data$y))
-                                     } else {
-                                       data["timeline_yval"] = 0.2
+                                     #browser()
+                                     if (!is.na(params$xmindate) & !is.null(data)) {
+                                       data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
                                      }
+                                     if (!is.na(params$xmaxdate) & !is.null(data)) {
+                                       data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
+                                     }
+                                     #if (!is.null(data$y)) {
+                                    #   data["timeline_yval"] <- data$y / (1 + max(data$y))
+                                    # } else {
+                                    #   data["timeline_yval"] = 0.2
+                                    # }
                                      # first we define the y values for the points (overriding the previous info)
-                                     data["y"] <- data["timeline_yval"]
+                                     #data["y"] <- data["timeline_yval"]
 
                                      # N.B. This geom is still under development to work out an issue with passing
                                      # in the data from the geom_timeline. At present, the LOCATION_NAME and earthquake
                                      # y location values are not accessible so placeholder text is being used...
                                      if (!is.null(params$n_max)) {
-                                       #data <- data %>% dplyr::top_n(params$n_max, EQ_PRIMARY)
+                                       #data <- data %>% dplyr::top_n(params$n_max, .$EQ_PRIMARY)
                                      }
                                      data["label"] <- "testing"
                                      data
@@ -357,10 +378,24 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::GeomText
 
                                    draw_panel = function(data, panel_params, coord, parse = FALSE,
                                                          na.rm = FALSE, check_overlap = FALSE) {
-                                     ##browser()
-                                     # return a nullGrob if no point info
+                                     #browser()
+                                     # return a nullGrob for GeomEarthquakeLabel if no point info
                                      n <- nrow(data)
                                      if (n < 1) return(grid::nullGrob())
+
+                                     if (!is.null(data$y)) {
+                                       ## set the y value for the points on the timeline to match the y axis location of the major tics
+                                       ## and hence to line up with the tick annotation on the y axis
+                                       data$timeline_yval <- panel_params$y.major[data$y]
+                                     } else {
+                                       ## establish a major tick at the y location of the points for this single group of points
+                                       ## set the y value for the points on the timeline to match the y axis location of the major tick
+                                       data$timeline_yval <- 0.2
+                                       panel_params$y.major_source[1] <- 1
+                                       panel_params$y.major[1] <- data$timeline_yval[1]
+                                       #data$timeline_yval <- data$y / (1 + max(data$y))
+                                     }
+
 
                                      lab <- data$label
                                      if (parse) {
@@ -457,20 +492,24 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::GeomText
 #'
 #' @export
 eq_map <- function(data = NULL, annot_col = "DATE") {
-  filtered_data <- data %>% dplyr::filter((!is.na(LONGITUDE) && (!is.na(LATITUDE)))) # remove any records without lat and lon data
-  circle_radius <- filtered_data$plot_magnitude*7000 # scale the circle size by the earthquake magnitude
-  popup_labels <- filtered_data %>% # start with the df containing records with both lat/lon data
-    dplyr::select(annot_col) %>% # and select the desired column
-    dplyr::transmute_all(., as.character) %>% # make sure the column is of type character
-    unlist(., use.names = FALSE) # and turn the single column df into a vector for the popup function
-  leaflet::leaflet(filtered_data) %>% # create the leaflet map from the filtered data
-    leaflet::addTiles() %>% # add the map layers
-    leaflet::addCircles(lat = ~LATITUDE, # add circles located at each earthquake location
-                        lng = ~LONGITUDE,
-                        weight = 2,
-                        radius = circle_radius,
-                        popup = popup_labels)
+  with(data, {
+    # remove any records without lat and lon data
+    filtered_data <- data %>% dplyr::filter((!is.na(data$LONGITUDE) && (!is.na(data$LATITUDE))))
+    circle_radius <- filtered_data$plot_magnitude*7000 # scale the circle size by the earthquake magnitude
+    popup_labels <- filtered_data %>% # start with the df containing records with both lat/lon data
+      dplyr::select(annot_col) %>% # and select the desired column
+      dplyr::transmute_all(., as.character) %>% # make sure the column is of type character
+      unlist(., use.names = FALSE) # and turn the single column df into a vector for the popup function
+    leaflet::leaflet(filtered_data) %>% # create the leaflet map from the filtered data
+      leaflet::addTiles() %>% # add the map layers
+      leaflet::addCircles(lat = ~LATITUDE, # add circles located at each earthquake location
+                          lng = ~LONGITUDE,
+                          weight = 2,
+                          radius = circle_radius,
+                          popup = popup_labels)
+  })
 }
+
 
 #' Create an HTML label that can be used as an annotation text in the leaflet map
 #'
@@ -499,29 +538,103 @@ eq_map <- function(data = NULL, annot_col = "DATE") {
 #'
 #' @export
 eq_create_label <- function(data = NULL) {
-  filtered_data <- data %>% dplyr::filter((!is.na(LONGITUDE) && (!is.na(LATITUDE)))) # remove any records without lat and lon data
-  popup_source_df <- filtered_data %>% # start with the data frame containing earthquakes with known location
-    dplyr::select(EQ_PRIMARY, TOTAL_DEATHS, LOCATION_NAME) # and select the desired columns for the popup text
-  popup_text_df <- data.frame(text_string = character(), stringsAsFactors=FALSE)
-  for (i in 1:nrow(popup_source_df)) # for each row
-  {
-    content <- ""
-    if (popup_source_df$LOCATION_NAME[i] != "") {
-      content <- paste0(content, "<b>Location:</b> ")
-      content <- paste0(content, popup_source_df$LOCATION_NAME[i])
+  with(data, {
+    filtered_data <- data %>% dplyr::filter((!is.na(LONGITUDE) && (!is.na(LATITUDE)))) # remove any records without lat and lon data
+    popup_source_df <- filtered_data %>% # start with the data frame containing earthquakes with known location
+      dplyr::select(EQ_PRIMARY, TOTAL_DEATHS, LOCATION_NAME) # and select the desired columns for the popup text
+    popup_text_df <- data.frame(text_string = character(), stringsAsFactors=FALSE)
+    for (i in 1:nrow(popup_source_df)) # for each row
+    {
+      content <- ""
+      if (popup_source_df$LOCATION_NAME[i] != "") {
+        content <- paste0(content, "<b>Location:</b> ")
+        content <- paste0(content, popup_source_df$LOCATION_NAME[i])
+      }
+      if (!is.na(popup_source_df$EQ_PRIMARY[i])) {
+        content <- paste0(content, "<br><b>Magnitude:</b> ")
+        content <- paste0(content, popup_source_df$EQ_PRIMARY[i])
+      }
+      if (!is.na(popup_source_df$TOTAL_DEATHS[i])) {
+        content <- paste0(content, "<br><b>Total deaths:</b> ")
+        content <- paste0(content, popup_source_df$TOTAL_DEATHS[i])
+      }
+      popup_text_df[i,1] <- content
     }
-    if (!is.na(popup_source_df$EQ_PRIMARY[i])) {
-      content <- paste0(content, "<br><b>Magnitude:</b> ")
-      content <- paste0(content, popup_source_df$EQ_PRIMARY[i])
-    }
-    if (!is.na(popup_source_df$TOTAL_DEATHS[i])) {
-      content <- paste0(content, "<br><b>Total deaths:</b> ")
-      content <- paste0(content, popup_source_df$TOTAL_DEATHS[i])
-    }
-    popup_text_df[i,1] <- content
-  }
-  popup_text_vector <- unlist(popup_text_df, use.names = FALSE)
-  return (popup_text_vector)
+    popup_text_vector <- unlist(popup_text_df, use.names = FALSE)
+    return (popup_text_vector)
+  })
+
+
 }
+
+# #' Nudge points a fixed distance
+# #'
+# #' 'position_nudge' is a utility function in ggplot2 and is used by geomText.
+# #'  Since the GeomEarthquakeLabel is based on GeomText, the position_nudge code is
+# #'  reproduced here so the function will be available internally for geom_timeline_label.
+# #'  This code is from the file https://github.com/tidyverse/ggplot2/blob/master/R/position-nudge.R
+# #'  in the ggplot2 repository.
+# #'
+# #' `position_nudge` is generally useful for adjusting the position of
+# #' items on discrete scales by a small amount. Nudging is built in to
+# #' [geom_text()] because it's so useful for moving labels a small
+# #' distance from what they're labelling.
+# #'
+# #' @family position adjustments
+# #' @param x,y Amount of vertical and horizontal distance to move.
+# #' #@export # we do not need to export this since it is only used internally for this geom
+# #' @examples
+# #' df <- data.frame(
+# #'   x = c(1,3,2,5),
+# #'   y = c("a","c","d","c")
+# #'   #' )
+# #'
+# #' ggplot(df, aes(x, y)) +
+# #'   geom_point() +
+# #'   geom_text(aes(label = y))
+# #'
+# #' ggplot(df, aes(x, y)) +
+# #'   geom_point() +
+# #'   geom_text(aes(label = y), position = position_nudge(y = -0.1))
+# #'
+# #' # Or, in brief
+# #' ggplot(df, aes(x, y)) +
+# #'   geom_point() +
+# #'   geom_text(aes(label = y), nudge_y = -0.1)
+# #'
+# position_nudge <- function(x = 0, y = 0) {
+#   ggproto(NULL, PositionNudge,
+#           x = x,
+#           y = y
+#   )
+# }
+# # ' @rdname ggplot2-ggproto
+# #'  @format NULL
+# #' @usage NULL
+# #' #@export  # this does not need to be exported since it is only used internally by this geom
+# PositionNudge <- ggproto("PositionNudge", Position,
+#                          x = 0,
+#                          y = 0,
+
+#                          required_aes = c("x", "y"),
+
+#                          setup_params = function(self, data) {
+#                            list(x = self$x, y = self$y)
+#                          },
+
+#                          compute_layer = function(data, params, panel) {
+#                            transform_position(data, function(x) x + params$x, function(y) y + params$y)
+#                          }
+# )
+
+
+
+
+
+
+
+
+
+
 
 

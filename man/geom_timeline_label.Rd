@@ -6,11 +6,12 @@
 \usage{
 geom_timeline_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 0,
-  check_overlap = FALSE, x = NULL, label = NULL, n_max = NA, ...)
+  inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 20,
+  check_overlap = FALSE, x = NULL, label = NULL, n_max = NA,
+  xmindate = NULL, xmaxdate = NULL, ...)
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappins created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
+\item{mapping}{A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
 it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.}
 
 \item{data}{The data to be displayed in this layer.  There are three options:
@@ -50,6 +51,10 @@ as described in ?plotmath}
 
 \item{n_max}{Number of largest earthquakes (by magnitude) that
 are included in the subset of earthquakes that are annotated.}
+
+\item{xmindate}{Minimum year to display on the timeline}
+
+\item{xmaxdate}{Maximum year to display on the timeline}
 
 \item{...}{Other arguments passed on layer.  Thes are often aesthetics, used to set an aesthetic to a fixed value,
 like color = "red" or size = 3.  They may also be parameters to the paired geom/stat.}

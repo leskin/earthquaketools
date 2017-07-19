@@ -10,7 +10,7 @@ geom_timeline(mapping = NULL, data = NULL, stat = "identity",
   xmaxdate = NULL, ...)
 }
 \arguments{
-\item{mapping}{A set of aesthetic mappins created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
+\item{mapping}{A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
 it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.}
 
 \item{data}{The data to be displayed in this layer.  There are three options:

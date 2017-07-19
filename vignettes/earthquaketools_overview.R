@@ -53,9 +53,9 @@ ggplot(eq_data) +
 #    geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5) +
 #    theme_classic() +
 #    theme(legend.position = "bottom",
-#          axis.title.y.left = element_blank(),
-#          axis.line.y.left = element_blank(),
-#          axis.ticks.y.left = element_blank(),
+#          axis.title.y = element_blank(),
+#          axis.line.y = element_blank(),
+#          axis.ticks.y = element_blank(),
 #          panel.grid.major.y = element_line(colour = "grey", size = 0.5)) +
 #    labs(size = "Richter scale value ", colour = "# deaths ")
 #  
