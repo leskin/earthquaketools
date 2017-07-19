@@ -8,7 +8,7 @@ geom_timeline_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 20,
   check_overlap = FALSE, x = NULL, label = NULL, n_max = NA,
-  xmindate = NULL, xmaxdate = NULL, ...)
+  xmindate = NA, xmaxdate = NA, ...)
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),

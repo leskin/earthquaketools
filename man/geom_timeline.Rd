@@ -6,8 +6,8 @@
 \usage{
 geom_timeline(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, x = NULL, y = NULL, xmindate = NULL,
-  xmaxdate = NULL, ...)
+  inherit.aes = TRUE, x = NULL, y = NULL, xmindate = NA,
+  xmaxdate = NA, ...)
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
