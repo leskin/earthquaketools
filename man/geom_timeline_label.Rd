@@ -8,7 +8,7 @@ geom_timeline_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
   inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 0.5,
   check_overlap = FALSE, x = NULL, label = NULL, n_max = NULL,
-  xmindate = NULL, xmaxdate = NULL, ...)
+  magnitude = NULL, xmindate = NULL, xmaxdate = NULL, ...)
 }
 \arguments{
 \item{mapping}{A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
@@ -33,7 +33,7 @@ A function will be called with a single argument, the plot data. The return valu
 False never includes, and TRUE always includes.}
 
 \item{inherit.aes}{If FALSE, overrides the default aesthetics, rather than combining with them.
-This is most usefule for helper functions that
+This is most useful for helper functions that
 define both data and aesthetics and shouldn't inherit behavior from the default plot specification, e.t. borders.}
 
 \item{parse}{If TRUE, the labels will be parsed into expressions and displayed
@@ -58,6 +58,8 @@ are included in the subset of earthquakes that are annotated.}
 
 \item{...}{Other arguments passed on layer.  Thes are often aesthetics, used to set an aesthetic to a fixed value,
 like color = "red" or size = 3.  They may also be parameters to the paired geom/stat.}
+
+\item{magnutude}{Optional parameter to define the column to use for the earthquake magnitude}
 }
 \value{
 This function has no return value
