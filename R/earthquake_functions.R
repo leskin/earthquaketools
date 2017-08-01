@@ -61,7 +61,6 @@ eq_clean_data <- function(earthquakes_raw) {
 
     return(earthquakes_clean)
   })
-
 }
 
 
@@ -129,36 +128,13 @@ stat_timeline <- function(mapping = NULL, data = NULL, geom = "point",
 }
 
 StatTimeline <- ggplot2::ggproto("StatTimeline", ggplot2::Stat,
-                                 #required_aes = c("x", "xmindate", "xmaxdate"),
                                  required_aes = "x",
                                  optional_aes = c("n_max", "xmindata", "xmaxdate"),
                                  default_aes = ggplot2::aes(
                                    xmindate = NULL, xmaxdate = NULL),
-                                   #y = ..magnitude..),
 
-                            #     setup_params = function(data, params, xmindate, xmaxdate) {
-                            #       browser() # in StatTimeline
-                            #       if (!is.null(params$xmindate) || !is.null(params$xmaxdate))
-                            #         return(params)
-
-                            #       if (!is.null(params$xmindate) & !is.null(data)) {
-                            #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
-                            #       }
-                            #       if (!is.null(params$xmaxdate) & !is.null(data)) {
-                            #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
-                            #       }
-
-                                   #xs <- split(data$x, data$group)
-                                   #bws <- vapply(xs, bw.nrd0, numeric(1))
-                                   #bw <- mean(bws)
-                                   #message("Picking bandwidth of ", signif(bw, 3))
-
-                                   #params$bandwidth <- bw
-                            #       params
-                            #     },
 
                                  compute_group = function(data, scales, xmindate, xmaxdate) {
-                                   # d <- density(data$x, bw = bandwidth)
                                    #browser() # in StatTimeline
                                    if (!is.null(xmindate) & !is.null(data)) {
                                      data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= xmindate)
@@ -168,9 +144,6 @@ StatTimeline <- ggplot2::ggproto("StatTimeline", ggplot2::Stat,
                                    }
                                  }
 )
-
-
-
 
 #' Geom for creating a timeline from earthquake data
 #'
@@ -261,57 +234,38 @@ geom_timeline <- function(mapping = NULL, data = NULL,
 GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                    required_aes = c("x"),
                                    optional_aes = c("y", "xmindate","xmaxdate"),
-                                   #non_missing_aes = c("size", "shape", "colour"),
-                                   default_aes = ggplot2::aes(#timeline_yval = 0.2,
+                                   default_aes = ggplot2::aes(
                                      y = NULL,
                                      shape = 19, colour = "black",
                                      fill = NA, alpha = 0.5,
-                                     #size = 1.5,
                                      stroke = 0.5, lwd = 1,
-                                     xmindate = NULL, xmaxdate = NULL#,
-                                     #linetype = 1
+                                     xmindate = NULL, xmaxdate = NULL
                                    ),
 
                                    draw_key = ggplot2::draw_key_point,
 
                                    setup_data = function(data, params) {
                                      #browser() # debugging GeomEarthquake
-                                  #   if (!is.na(params$xmindate) & !is.null(data)) {
-                                  #     data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
-                                  #   }
-                                  #   if (!is.na(params$xmaxdate) & !is.null(data)) {
-                                  #     data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
-                                  #   }
-                                     #browser()
                                      if (!is.numeric(data$size)) {
                                        data <- data %>% dplyr::mutate(size = as.double(size))
                                      }
-                                     #if (!is.null(data$y)) {
-                                    #   data["timeline_yval"] <- data$y / (1 + max(data$y))
-                                    # } else {
-                                    #   data["timeline_yval"] = 0.2
-                                    # }
-                                     #browser()
                                      data
                                    },
 
                                    draw_group = function(data, panel_scales, coord) {
-                                   #draw_panel = function(data, panel_params, coord) {
                                      #browser()
                                      # return a nullGrob for GeomEarthquake if no point info
                                      n <- nrow(data)
                                      if (n < 1) return(grid::nullGrob())
 
                                      if (!is.null(data$y)) {
-                                       ## set the y value for the points on the timeline to match the y axis location of the major tics
+                                       ## set the y value for the points on the timeline to match the
+                                       ## y axis location of the major tics
                                        ## and hence to line up with the tick annotation on the y axis
                                        data$timeline_yval <- panel_scales$y.major[data$y]
                                      } else {
-                                       ## establish a major tick at the y location of the points for this single group of points
-                                       ## set the y value for the points on the timeline to match the y axis location of the major tick
+                                       ## set the y value for the points on the timeline to be 20% of the way up the y axis
                                        data$timeline_yval <- 0.2
-                                       #panel_scales$y.major_source[1] <- 1
-                                       #panel_scales$y.major[1] <- data$timeline_yval[1]
                                      }
 
                                      ## Transform the data first
@@ -319,10 +273,6 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 
                                      x <- panel_scales$x.range
                                      x_limits <- coord$transform(as.data.frame(x), panel_scales)
-
-                                     #raw_x_limits <- as.data.frame(panel_scales$x.range, col.names = c("x"))
-
-                                     #x_limits <- coord$transform(raw_x_limits, panel_scales)
 
                                      timeline_points_grob <- grid::pointsGrob(
                                        coords$x, coords$timeline_yval,
@@ -337,12 +287,8 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                      )
 
                                      timeline_line_grob <- grid::segmentsGrob(
-                                       #x0 = grid::unit(panel_scales$x.minor[1], "native"),
-                                       #x0 = grid::unit(coords$xmindate[1], "native"),
                                        x0 = grid::unit(x_limits$x[1], "native"),
                                        y0 = grid::unit(data$timeline_yval[1], "native"),
-                                       #x1 = grid::unit(panel_scales$x.minor[8], "native"),
-                                       #x1 = grid::unit(coords$xmaxdate[1], "native"),
                                        x1 = grid::unit(x_limits$x[2], "native"),
                                        y1 = grid::unit(data$timeline_yval[1], "native"),
                                        default.units = "native",
@@ -360,39 +306,10 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                        )
                                      )
 
-                                     #timeline_grob <- grid::gTree(chilren = grid::gList(timeline_points_grob, timeline_line_grob))
-
-                                     #timeline_grob
-                                     #grid::gTree(chilren = grid::gList(timeline_points_grob, timeline_line_grob))
-                                     #grid::gTree(chilren = grid::gList(timeline_points_grob))
-                                     #grid::grobTree(timeline_points_grob, timeline_line_grob)
                                      grid::grobTree(timeline_points_grob, timeline_line_grob, timeline_xaxis_grob)
 
-                                     #timeline_points_grob
-
-                                     #  ggname <- function (prefix, grob) {
-                                     #  grob$name <- grobName(grob, prefix)
-                                     #    grob
-                                     #  }
-
-                                     # hLineData <- data.frame(yintercept = data$timeline_yval[1], size = 1, colour = "black", alpha = 1)
-
-                                     ##with(data, ggname(.$my_name(), grobTree(geom_timeline, geom_hline(yintercept = timeline_yval))))
-                                     #with(data, ggname("geom_timeline", grobTree(
-                                     #  #GeomHline$draw_panel(hLineData, panel_params, coord),
-                                     #  GeomHline$draw_panel(hLineData, panel_params, coord),
-                                     #  GeomEarthquake$draw_panel(data, panel_params, coord)
-                                     #)))
-                                   }#,
-
-                                  #draw_panel = function(data, panel_scales, coord) {
-                                    # only need to draw the axis once instead of once per gcoup
-                                    # so call xaxisGrob from draw_panel
-                                  #  grid::xaxisGrob()
-                                  #}
+                                   }
 )
-
-
 
 #' Stat for creating a timeline from earthquake data labels
 #'
@@ -467,31 +384,8 @@ StatTimelineLabel <- ggplot2::ggproto("StatTimelineLabel", ggplot2::Stat,
                                  default_aes = ggplot2::aes(
                                    xmindate = NULL, xmaxdate = NULL,
                                    n_max = NA),
-                                 #y = ..magnitude..),
-
-                                 #     setup_params = function(data, params, xmindate, xmaxdate) {
-                                 #       browser() # in StatTimeline
-                                 #       if (!is.null(params$xmindate) || !is.null(params$xmaxdate))
-                                 #         return(params)
-
-                                 #       if (!is.null(params$xmindate) & !is.null(data)) {
-                                 #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
-                                 #       }
-                                 #       if (!is.null(params$xmaxdate) & !is.null(data)) {
-                                 #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
-                                 #       }
-
-                                 #xs <- split(data$x, data$group)
-                                 #bws <- vapply(xs, bw.nrd0, numeric(1))
-                                 #bw <- mean(bws)
-                                 #message("Picking bandwidth of ", signif(bw, 3))
-
-                                 #params$bandwidth <- bw
-                                 #       params
-                                 #     },
 
                                  compute_group = function(data, scales, xmindate, xmaxdate, n_max) {
-                                   # d <- density(data$x, bw = bandwidth)
                                    #browser() # in StatTimeline
                                    if (!is.null(xmindate) & !is.null(data)) {
                                      data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= xmindate)
@@ -506,8 +400,6 @@ StatTimelineLabel <- ggplot2::ggproto("StatTimelineLabel", ggplot2::Stat,
                                    }
                                  }
 )
-
-
 
 #'
 #' Geom for adding annotations to earthquake data displyed with geom_timeline
@@ -570,45 +462,11 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
                                 na.rm = FALSE,
                                 show.legend = NA,
                                 inherit.aes = TRUE,
-                                #parse = FALSE,
-                                #nudge_x = 0,
-                                #nudge_y = 0.5,
-                                #check_overlap = FALSE,
-                                ##x, label,
-                                #y = NULL,
-                                x = NULL, #y = NULL,
+                                x = NULL,
                                 label = NULL,
                                 n_max = NULL, magnitude = NULL,
                                 xmindate = NULL, xmaxdate = NULL,
-
-                                #df = (.),
                                 ...) {
-
-  #if (!missing(nudge_x) || !missing(nudge_y) || nudge_x != 0 || nudge_y != 0) {
-  #  if (!missing(position)) {
-  #    stop("specify either 'position' or 'nudge_x'/'nudge_y'", call. = FALSE)
-  #  }
-  #  position <- ggplot2::position_nudge(nudge_x, nudge_y)
-  #}
-
-  #browser() # in geom_timeline_label
-  #magnitude <- data$EQ_PRIMARY
-  #magnitude <- 5
-
-  # subset the data by date
-  #  if (!is.na(xmindate) & !is.null(data)) {
-  #    data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(DATE, "1970-01-01 00:00.00 UTC")) >= xmindate)
-  #  }
-  #  if (!is.na(xmaxdate) & !is.null(data)) {
-  #    data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(DATE, "1970-01-01 00:00.00 UTC")) <= xmaxdate)
-  #  }
-
-  # subset the data to include the largest n_max points by magnitude (size)
-  #if (!is.null(n_max)) {
-  #  data <- data %>% dplyr::top_n(n_max, data$size)
-  #}
-  #data["label"] <- data$label
-
 
   ggplot2::layer(
     geom = GeomEarthquakeLabel,
@@ -619,8 +477,6 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
     params = list(
-      #parse = parse,
-      #check_overlap = check_overlap,
       xmindate = xmindate,
       xmaxdate = xmaxdate,
       n_max = n_max,
@@ -635,13 +491,8 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::Geom,
                                         optional_aes = c("y", "n_max","magnitude"),
                                         default_aes = ggplot2::aes(
                                           x = NULL, y = NULL, label = NULL,
-                                          #y = NULL,
                                           n_max = NA,
                                           colour = "black", size = 3.88, angle = 45,
-                                          #hjust = 0.5, vjust = 2, alpha = NA,
-                                          #family = "", fontface = 1, lineheight = 1.2,
-                                          #shape = 19,
-                                          #fill = NA, alpha = 0.5,
                                           xmindate = NULL, xmaxdate = NULL, magnitude = NULL
                                         ),
                                         draw_key = ggplot2::draw_key_blank,
@@ -680,10 +531,6 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::Geom,
                                         }
 
 )
-
-
-
-
 
 #'
 #' Maps the epicenter (LATITUDE/LONGITUDE) of each earthquake in a data frame and annotates each point with a pop up window.
@@ -788,75 +635,3 @@ eq_create_label <- function(data = NULL) {
 
 
 }
-
-# #' Nudge points a fixed distance
-# #'
-# #' 'position_nudge' is a utility function in ggplot2 and is used by geomText.
-# #'  Since the GeomEarthquakeLabel is based on GeomText, the position_nudge code is
-# #'  reproduced here so the function will be available internally for geom_timeline_label.
-# #'  This code is from the file https://github.com/tidyverse/ggplot2/blob/master/R/position-nudge.R
-# #'  in the ggplot2 repository.
-# #'
-# #' `position_nudge` is generally useful for adjusting the position of
-# #' items on discrete scales by a small amount. Nudging is built in to
-# #' [geom_text()] because it's so useful for moving labels a small
-# #' distance from what they're labelling.
-# #'
-# #' @family position adjustments
-# #' @param x,y Amount of vertical and horizontal distance to move.
-# #' #@export # we do not need to export this since it is only used internally for this geom
-# #' @examples
-# #' df <- data.frame(
-# #'   x = c(1,3,2,5),
-# #'   y = c("a","c","d","c")
-# #'   #' )
-# #'
-# #' ggplot(df, aes(x, y)) +
-# #'   geom_point() +
-# #'   geom_text(aes(label = y))
-# #'
-# #' ggplot(df, aes(x, y)) +
-# #'   geom_point() +
-# #'   geom_text(aes(label = y), position = position_nudge(y = -0.1))
-# #'
-# #' # Or, in brief
-# #' ggplot(df, aes(x, y)) +
-# #'   geom_point() +
-# #'   geom_text(aes(label = y), nudge_y = -0.1)
-# #'
-# position_nudge <- function(x = 0, y = 0) {
-#   ggproto(NULL, PositionNudge,
-#           x = x,
-#           y = y
-#   )
-# }
-# # ' @rdname ggplot2-ggproto
-# #'  @format NULL
-# #' @usage NULL
-# #' #@export  # this does not need to be exported since it is only used internally by this geom
-# PositionNudge <- ggproto("PositionNudge", Position,
-#                          x = 0,
-#                          y = 0,
-
-#                          required_aes = c("x", "y"),
-
-#                          setup_params = function(self, data) {
-#                            list(x = self$x, y = self$y)
-#                          },
-
-#                          compute_layer = function(data, params, panel) {
-#                            transform_position(data, function(x) x + params$x, function(y) y + params$y)
-#                          }
-# )
-
-
-
-
-
-
-
-
-
-
-
-
