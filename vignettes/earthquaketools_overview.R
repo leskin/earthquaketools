@@ -45,20 +45,21 @@ ggplot(eq_data) +
   labs(size = "Richter scale value ", colour = "# deaths ")
 
 
-## ---- eval = FALSE, fig.width=7------------------------------------------
-#  
-#  ggplot(eq_data) +
-#    geom_timeline(aes(x = DATE, y = COUNTRY, colour = TOTAL_DEATHS, size = EQ_PRIMARY),
-#                  alpha = 0.5, xmindate = 2000, xmaxdate = 2017) +
-#    geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5) +
-#    theme_classic() +
-#    theme(legend.position = "bottom",
-#          axis.title.y = element_blank(),
-#          axis.line.y = element_blank(),
-#          axis.ticks.y = element_blank(),
-#          panel.grid.major.y = element_line(colour = "grey", size = 0.5)) +
-#    labs(size = "Richter scale value ", colour = "# deaths ")
-#  
+## ---- eval = TRUE, fig.width=7-------------------------------------------
+
+ ggplot(eq_data, aes(DATE, COUNTRY)) +
+     geom_timeline(aes(colour = TOTAL_DEATHS, size = EQ_PRIMARY), 
+                   alpha = 0.5, xmindate = 2013, xmaxdate = 2017) +
+     geom_timeline_label(aes(size = EQ_PRIMARY, label = EQ_PRIMARY), 
+                         n_max = 5, xmindate = 2013, xmaxdate = 2017) +
+     theme_classic() +
+     theme(legend.position = "bottom",
+        axis.title.y = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_line(colour = "grey", size = 0.5)) +
+     labs(size = "Richter scale value ", colour = "# deaths ") 
+
 
 ## ---- eval = TRUE, fig.width=7-------------------------------------------
 

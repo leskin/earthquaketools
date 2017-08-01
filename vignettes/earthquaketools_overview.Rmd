@@ -103,21 +103,22 @@ ggplot(eq_data) +
 ## geom_timeline_label() Function
 
 The geom_timeline_label() function enables the user to add annotations to the earthquakes shown on the timeline.  The label aesthetic will select the data frame column to use for the annotation text and the n_max aesthetic may be selected to limit the number of 
-annotations to the n_max largest earthquakes (by magnitude).  In the example below, the timeline above is enhanced to add 5 annotations, using the text from the LOCATION_NAME column.
+annotations to the n_max largest earthquakes (by magnitude).  In the example below, the timeline above is enhanced to add 5 annotations, using the text from the EQ_PRIMARY column to label the size of the earthquakes.  Note that six earthquakes were labeled for the country of China, because two earthquakes had the same size equal to 6.0 on the Richter Scale.
 
-```{r, eval = FALSE, fig.width=7}
+```{r, eval = TRUE, fig.width=7}
 
-ggplot(eq_data) +
-  geom_timeline(aes(x = DATE, y = COUNTRY, colour = TOTAL_DEATHS, size = EQ_PRIMARY), 
-                alpha = 0.5, xmindate = 2000, xmaxdate = 2017) +
-  geom_timeline_label(aes(label = LOCATION_NAME), n_max = 5) +
-  theme_classic() +
-  theme(legend.position = "bottom",
+ ggplot(eq_data, aes(DATE, COUNTRY)) +
+     geom_timeline(aes(colour = TOTAL_DEATHS, size = EQ_PRIMARY), 
+                   alpha = 0.5, xmindate = 2013, xmaxdate = 2017) +
+     geom_timeline_label(aes(size = EQ_PRIMARY, label = EQ_PRIMARY), 
+                         n_max = 5, xmindate = 2013, xmaxdate = 2017) +
+     theme_classic() +
+     theme(legend.position = "bottom",
         axis.title.y = element_blank(), 
         axis.line.y = element_blank(), 
         axis.ticks.y = element_blank(),
         panel.grid.major.y = element_line(colour = "grey", size = 0.5)) +
-  labs(size = "Richter scale value ", colour = "# deaths ") 
+     labs(size = "Richter scale value ", colour = "# deaths ") 
 
 ```
 

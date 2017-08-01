@@ -96,7 +96,6 @@ eq_clean_data <- function(earthquakes_raw) {
 #' #@param y Factor indicating some striatification in which case multiple time lines will be ploted for each level of the factor (e.g. country).
 #' @param xmindate Minimum year to display on the timeline
 #' @param xmaxdate Maximum year to display on the timeline
-#' @param n_max The maximum number of (largest) earthquakes to include on the timeline
 #'
 #' @return This function has no return value
 #'
@@ -112,7 +111,7 @@ eq_clean_data <- function(earthquakes_raw) {
 stat_timeline <- function(mapping = NULL, data = NULL, geom = "point",
                                 position = "identity", na.rm = FALSE, show.legend = NA,
                                 inherit.aes = TRUE,
-                                x = NULL, xmindate = NULL, xmaxdate = NULL, n_max = NULL,
+                                x = NULL, xmindate = NULL, xmaxdate = NULL,
                                 ...) {
   ggplot2::layer(
     stat = StatTimeline,
@@ -125,7 +124,6 @@ stat_timeline <- function(mapping = NULL, data = NULL, geom = "point",
     params = list(
       xmindate = xmindate,
       xmaxdate = xmaxdate,
-      n_max = n_max,
       na.rm = na.rm, ...)
   )
 }
@@ -133,6 +131,7 @@ stat_timeline <- function(mapping = NULL, data = NULL, geom = "point",
 StatTimeline <- ggplot2::ggproto("StatTimeline", ggplot2::Stat,
                                  #required_aes = c("x", "xmindate", "xmaxdate"),
                                  required_aes = "x",
+                                 optional_aes = c("n_max", "xmindata", "xmaxdate"),
                                  default_aes = ggplot2::aes(
                                    xmindate = NULL, xmaxdate = NULL),
                                    #y = ..magnitude..),
@@ -167,10 +166,6 @@ StatTimeline <- ggplot2::ggproto("StatTimeline", ggplot2::Stat,
                                    if (!is.null(xmaxdate) & !is.null(data)) {
                                      data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= xmaxdate)
                                    }
-                                   # subset the data to include the largest n_max points by magnitude (size) if applicable
-                                   #if (!is.null(n_max)) {
-                                  #   data <- data %>% dplyr::top_n(n_max, data$size)
-                                  # }
                                  }
 )
 
@@ -257,9 +252,8 @@ geom_timeline <- function(mapping = NULL, data = NULL,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
-    params = list(#y = y,
-                  #timeline_yval = timeline_yval,
-                  xmindate = xmindate, xmaxdate = xmaxdate,
+    params = list(xmindate = xmindate,
+                  xmaxdate = xmaxdate,
                   na.rm = na.rm, ...)
   )
 }
@@ -398,6 +392,123 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                   #}
 )
 
+
+
+#' Stat for creating a timeline from earthquake data labels
+#'
+#' This function creates a new stat which will create a linear timeline for a
+#' specified time range, and will display each earthquake as a point on the timeline.
+#'
+#' This code is based on input from the Extending ggplot2 vignette:
+#' https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
+#'
+#' @param mapping A set of aesthetic mappings created by aes or aes_.  If specified and inherit.aes = TRUE (the default),
+#' it is combined with the default mappint at the top level of the plot.  You must supply mapping if there is no plot mapping.
+#' @param data The data to be displayed in this layer.  There are three options:
+#'
+#' If NULL, the default, the data is inherited from the plot data as specified in the call to ggplot.
+#'
+#' A data.frame, or other object, will override the plot data.  All objects will be fortified to produce a data frame.
+#' See fortify for which variables will be created.
+#'
+#' A function will be called with a single argument, the plot data. The return value must be a data.frame, and will be used as the layer data.
+#' @param geom The geom to use on the data for this layer, as a string.
+#' @param position Position adjustment, either as a string, or the result of a call to a position adjustment function.
+#' @param ... Other arguments passed on layer.  Thes are often aesthetics, used to set an aesthetic to a fixed value, like color = "red" or size = 3.
+#' They may also be parameters to the paired geom/stat.
+#' @param na.rm If FALSE, the default, missing values are mremoved with a warning.  If TRUE, missing values are silently removed.
+#' @param show.legend logical.  Should this layer be included in the legends?  NA, the default, incldes if any aesthetics are mapped.  False never includes,
+#' and TRUE always includes.
+#' @param inherit.aes If FALSE, overrides the default aesthetics, rather than combining with them.  This is most usefule for helper functions that
+#' define both data and aesthetics and shouldn't inherit behavior from the default plot specification, e.t. borders.
+#' @param x Date of the earthquake (required)
+#' @param label Name of column to use for labels (required)
+#' #@param y Factor indicating some striatification in which case multiple time lines will be ploted for each level of the factor (e.g. country).
+#' @param xmindate Minimum year to display on the timeline
+#' @param xmaxdate Maximum year to display on the timeline
+#' @param n_max The maximum number of (largest) earthquakes to include on the timeline
+#'
+#' @return This function has no return value
+#'
+#' @importFrom ggplot2 ggproto layer Stat
+#'
+#' @examples
+#' \dontrun{stat_timeline_label(data = earthquakes_clean,
+#'                        aes(x = DATE, label = LOCATION_NAME),
+#'                        xmindate = 2000, xmaxdate = 2017)}
+#'
+#' #@export
+#'
+stat_timeline_label <- function(mapping = NULL, data = NULL, geom = "point",
+                          position = "identity", na.rm = FALSE, show.legend = NA,
+                          inherit.aes = TRUE,
+                          x = NULL, label = NULL,
+                          xmindate = NULL, xmaxdate = NULL, n_max = NA,
+                          ...) {
+  ggplot2::layer(
+    stat = StatTimelineLabel,
+    data = data,
+    mapping = mapping,
+    geom = geom,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(
+      xmindate = xmindate,
+      xmaxdate = xmaxdate,
+      n_max = n_max,
+      na.rm = na.rm, ...)
+  )
+}
+
+StatTimelineLabel <- ggplot2::ggproto("StatTimelineLabel", ggplot2::Stat,
+                                 required_aes = c("x","label"),
+                                 optional_aes = c("n_max", "xmindata", "xmaxdate"),
+                                 default_aes = ggplot2::aes(
+                                   xmindate = NULL, xmaxdate = NULL,
+                                   n_max = NA),
+                                 #y = ..magnitude..),
+
+                                 #     setup_params = function(data, params, xmindate, xmaxdate) {
+                                 #       browser() # in StatTimeline
+                                 #       if (!is.null(params$xmindate) || !is.null(params$xmaxdate))
+                                 #         return(params)
+
+                                 #       if (!is.null(params$xmindate) & !is.null(data)) {
+                                 #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= params$xmindate)
+                                 #       }
+                                 #       if (!is.null(params$xmaxdate) & !is.null(data)) {
+                                 #         data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= params$xmaxdate)
+                                 #       }
+
+                                 #xs <- split(data$x, data$group)
+                                 #bws <- vapply(xs, bw.nrd0, numeric(1))
+                                 #bw <- mean(bws)
+                                 #message("Picking bandwidth of ", signif(bw, 3))
+
+                                 #params$bandwidth <- bw
+                                 #       params
+                                 #     },
+
+                                 compute_group = function(data, scales, xmindate, xmaxdate, n_max) {
+                                   # d <- density(data$x, bw = bandwidth)
+                                   #browser() # in StatTimeline
+                                   if (!is.null(xmindate) & !is.null(data)) {
+                                     data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) >= xmindate)
+                                   }
+                                   if (!is.null(xmaxdate) & !is.null(data)) {
+                                     data <- data %>% dplyr::filter(lubridate::year(lubridate::as_datetime(data$x, "1970-01-01 00:00.00 UTC")) <= xmaxdate)
+                                   }
+                                   #browser()
+                                   # subset the data to include the largest n_max points by magnitude (size) if applicable
+                                   if (!is.na(n_max)) {
+                                     data <- data %>% dplyr::top_n(n_max, data$size)
+                                   }
+                                 }
+)
+
+
+
 #'
 #' Geom for adding annotations to earthquake data displyed with geom_timeline
 #'
@@ -482,7 +593,7 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
 
   #browser() # in geom_timeline_label
   #magnitude <- data$EQ_PRIMARY
-  magnitude <- 5
+  #magnitude <- 5
 
   # subset the data by date
   #  if (!is.na(xmindate) & !is.null(data)) {
@@ -503,7 +614,7 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
     geom = GeomEarthquakeLabel,
     mapping = mapping,
     data = data,
-    stat = StatTimeline,
+    stat = StatTimelineLabel,
     position = position,
     show.legend = show.legend,
     inherit.aes = inherit.aes,
@@ -512,10 +623,6 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
       #check_overlap = check_overlap,
       xmindate = xmindate,
       xmaxdate = xmaxdate,
-      magnitude = magnitude,
-      #df = df,
-      #x = x,
-      label = label,
       n_max = n_max,
       na.rm = na.rm,
       ...
@@ -529,13 +636,15 @@ GeomEarthquakeLabel <- ggplot2::ggproto("GeomEarthquakeLabel", ggplot2::Geom,
                                         default_aes = ggplot2::aes(
                                           x = NULL, y = NULL, label = NULL,
                                           #y = NULL,
-                                          n_max = NULL,
+                                          n_max = NA,
                                           colour = "black", size = 3.88, angle = 45,
                                           #hjust = 0.5, vjust = 2, alpha = NA,
                                           #family = "", fontface = 1, lineheight = 1.2,
+                                          #shape = 19,
+                                          #fill = NA, alpha = 0.5,
                                           xmindate = NULL, xmaxdate = NULL, magnitude = NULL
                                         ),
-                                        draw_key = ggplot2::draw_key_text,
+                                        draw_key = ggplot2::draw_key_blank,
 
                                         draw_panel = function(data, params, coord) {
 
