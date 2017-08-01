@@ -6,8 +6,7 @@
 \usage{
 geom_timeline_label(mapping = NULL, data = NULL, stat = "identity",
   position = "identity", na.rm = FALSE, show.legend = NA,
-  inherit.aes = TRUE, parse = FALSE, nudge_x = 0, nudge_y = 0.5,
-  check_overlap = FALSE, x = NULL, label = NULL, n_max = NULL,
+  inherit.aes = TRUE, x = NULL, label = NULL, n_max = NULL,
   magnitude = NULL, xmindate = NULL, xmaxdate = NULL, ...)
 }
 \arguments{
@@ -36,21 +35,19 @@ False never includes, and TRUE always includes.}
 This is most useful for helper functions that
 define both data and aesthetics and shouldn't inherit behavior from the default plot specification, e.t. borders.}
 
-\item{parse}{If TRUE, the labels will be parsed into expressions and displayed
-as described in ?plotmath}
-
-\item{nudge_x}{Horizontal offset for text from point}
-
-\item{nudge_y}{Vertical offset for text from point}
-
-\item{check_overlap}{If TRUE, text that overlaps previous text in the same layer will not be plotted}
-
 \item{x}{Date of the earthquake (required)}
 
 \item{label}{Name of the column to be used for the annotation text.}
 
 \item{n_max}{Number of largest earthquakes (by magnitude) that
-are included in the subset of earthquakes that are annotated.}
+are included in the subset of earthquakes that are annotated.
+#@param nudge_x Horizontal offset for text from point
+#@param nudge_y Vertical offset for text from point
+#@param parse If TRUE, the labels will be parsed into expressions and displayed
+  as described in ?plotmath
+#@param check_overlap If TRUE, text that overlaps previous text in the same layer will not be plotted}
+
+\item{magnitude}{Optional parameter to define the column to use for the earthquake magnitude}
 
 \item{xmindate}{Minimum year to display on the timeline}
 
@@ -58,8 +55,6 @@ are included in the subset of earthquakes that are annotated.}
 
 \item{...}{Other arguments passed on layer.  Thes are often aesthetics, used to set an aesthetic to a fixed value,
 like color = "red" or size = 3.  They may also be parameters to the paired geom/stat.}
-
-\item{magnutude}{Optional parameter to define the column to use for the earthquake magnitude}
 }
 \value{
 This function has no return value

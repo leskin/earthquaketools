@@ -442,7 +442,7 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 #' #@param check_overlap If TRUE, text that overlaps previous text in the same layer will not be plotted
 #' @param xmindate Minimum year to display on the timeline
 #' @param xmaxdate Maximum year to display on the timeline
-#' @param magnutude Optional parameter to define the column to use for the earthquake magnitude
+#' @param magnitude Optional parameter to define the column to use for the earthquake magnitude
 #'
 #' @return This function has no return value
 #'
@@ -464,7 +464,9 @@ geom_timeline_label <- function(mapping = NULL, data = NULL,
                                 #nudge_y = 0.5,
                                 #check_overlap = FALSE,
                                 ##x, label,
-                                x = NULL, y = NULL, label = NULL,
+                                #y = NULL,
+                                x = NULL, #y = NULL,
+                                label = NULL,
                                 n_max = NULL, magnitude = NULL,
                                 xmindate = NULL, xmaxdate = NULL,
 
