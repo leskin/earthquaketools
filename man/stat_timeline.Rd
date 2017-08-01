@@ -2,7 +2,7 @@
 % Please edit documentation in R/earthquake_functions.R
 \name{stat_timeline}
 \alias{stat_timeline}
-\title{Stat for creating a timeline from earthquake data}
+\title{Stat for creating a timeline for earthquake data}
 \usage{
 stat_timeline(mapping = NULL, data = NULL, geom = "point",
   position = "identity", na.rm = FALSE, show.legend = NA,
@@ -59,6 +59,5 @@ https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
                        aes(x = DATE),
                        xmindate = 2000, xmaxdate = 2017)}
 
-#@export
-
 }
+\keyword{internal}

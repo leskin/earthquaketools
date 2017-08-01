@@ -64,7 +64,7 @@ eq_clean_data <- function(earthquakes_raw) {
 }
 
 
-#' Stat for creating a timeline from earthquake data
+#' Stat for creating a timeline for earthquake data
 #'
 #' This function creates a new stat which will create a linear timeline for a
 #' specified time range, and will display each earthquake as a point on the timeline.
@@ -99,13 +99,14 @@ eq_clean_data <- function(earthquakes_raw) {
 #' @return This function has no return value
 #'
 #' @importFrom ggplot2 ggproto layer Stat
+#' @importFrom dplyr filter
 #'
 #' @examples
 #' \dontrun{stat_timeline(data = earthquakes_clean,
 #'                        aes(x = DATE),
 #'                        xmindate = 2000, xmaxdate = 2017)}
 #'
-#' #@export
+#' @keywords internal
 #'
 stat_timeline <- function(mapping = NULL, data = NULL, geom = "point",
                                 position = "identity", na.rm = FALSE, show.legend = NA,
@@ -311,10 +312,11 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
                                    }
 )
 
-#' Stat for creating a timeline from earthquake data labels
+#' Stat for creating a timeline for earthquake data labels
 #'
 #' This function creates a new stat which will create a linear timeline for a
-#' specified time range, and will display each earthquake as a point on the timeline.
+#' specified time range, and will label each earthquake (up to n_max) as a label
+#' connected with a line to a point on the timeline.
 #'
 #' This code is based on input from the Extending ggplot2 vignette:
 #' https://cran.r-project.org/web/packages/ggplot2/vignettes/extending-ggplot2.html
@@ -348,13 +350,14 @@ GeomEarthquake <- ggplot2::ggproto("GeomEarthquake", ggplot2::Geom,
 #' @return This function has no return value
 #'
 #' @importFrom ggplot2 ggproto layer Stat
+#' @importFrom dplyr filter top_n
 #'
 #' @examples
 #' \dontrun{stat_timeline_label(data = earthquakes_clean,
 #'                        aes(x = DATE, label = LOCATION_NAME),
-#'                        xmindate = 2000, xmaxdate = 2017)}
+#'                        xmindate = 2000, xmaxdate = 2017, n_max = 5)}
 #'
-#' #@export
+#' @keywords internal
 #'
 stat_timeline_label <- function(mapping = NULL, data = NULL, geom = "point",
                           position = "identity", na.rm = FALSE, show.legend = NA,
